@@ -86,3 +86,48 @@ update endereco set estado = 'RS' where bairro = 'Madri';
 select cliente.nome, pedido.data from cliente join pedido on pedido.cliente_id = cliente.id;
 
 --listar total pedidos por cliente
+
+--------------------------------------------VIEW--------------------------------------------------------
+-- tirar o ç do cliente -> endereço_id
+-- drop view pedidos_cidade_data
+-- View para visualizar pedidos cliente/cidade/data
+create view pedidos_cidade_data as
+select cliente.nome, pedido.data, endereco.cidade from cliente, pedido, endereco 
+  where cliente.id = pedido.cliente_id and cliente.endereço_id = endereco.id
+;
+
+select * from pedidos_cidade_data;
+
+--View para visualizar clientes com a marca do carro e que tem a fidelidade 1
+create view cliente_fidelidade1 as
+select cliente.nome, carro.marca from cliente join carro on cliente.fidelidade = 1 and cliente.carro_id = carro.id;
+;
+
+select * from cliente_fidelidade1;
+
+--------------------------------------------FUNCTION--------------------------------------------------------
+create or replace function calculaPedido(integer) returns real as 
+$$
+select valor from servico;
+--return valor*2;
+$$
+language sql;
+
+select calculaPedido(3);
+--===========================================================================================
+create or replace function VerificaFidelidade (integer,integer) returns boolean as
+$$
+declare
+	qtde integer;
+begin
+	select into qtde fidelidade from cliente where id = $2;
+        if(qtde >= $5) then
+	return true;
+else
+	return false;
+end if;
+end
+$$
+language plpgsql;
+
+select VerificaFidelidade(5, 5);
